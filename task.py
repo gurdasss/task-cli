@@ -34,6 +34,8 @@ class Task:
 
     def _update_state(self, state):
         """This method will update the state as well as updated_at property"""
+        if self.state == state:
+            return  # No state change, so we can skip updating
         self.state = state
         self.updated_at = self.get_current_time()
 
