@@ -32,7 +32,8 @@ if __name__ == "__main__":
                 task_manager.tasks.append(task)
                 task.task_id = max(task.task_id, task.id)  # Ensure task_id is updated to the max ID
 
-    while True:
+    flag = True
+    while flag:
         current_input = input("task-cli> ")
         # Need to split the input into command and arguments
         # and the separator will be space, and quotes should be handled as well
@@ -44,7 +45,7 @@ if __name__ == "__main__":
         if command == "cls":
             clear_screen()
         elif command == "exit":
-            break
+            flag = False
         elif command == "add":
             if not args:
                 print("Description is required for adding a task.")
@@ -114,6 +115,8 @@ if __name__ == "__main__":
                     print(
                         f"ID: {task.id}, Description: {task.description}, Status: {task.state}, Created At: {task.created_at}, Updated At: {task.updated_at}"
                     )
+        else:
+            print("Unknown command. Available commands: add, del, update, list, cls, exit.")
         
         # Save tasks to JSON file before exiting
         with open(json_file_path, "w") as f:
