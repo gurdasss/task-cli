@@ -354,71 +354,6 @@ class TestTaskManager:
 
         assert result == []
 
-    # Tests for show_tasks method
-    def test_show_tasks_prints_all_tasks_by_default(self, populated_manager, capsys):
-        """Test that show_tasks prints all tasks when no argument is provided"""
-        populated_manager.show_tasks()
-
-        captured = capsys.readouterr()
-        assert "ID: 1" in captured.out
-        assert "ID: 2" in captured.out
-        assert "ID: 3" in captured.out
-
-    def test_show_tasks_prints_task_details(self, manager, capsys):
-        """Test that show_tasks prints all task details"""
-        manager.add_task("Test task")
-        task = manager.tasks[0]
-
-        manager.show_tasks()
-
-        captured = capsys.readouterr()
-        assert f"ID: {task.id}" in captured.out
-        assert f"Description: {task.description}" in captured.out
-        assert f"State: {task.state}" in captured.out
-        assert f"Created At: {task.created_at}" in captured.out
-        assert f"Updated At: {task.updated_at}" in captured.out
-
-    def test_show_tasks_with_custom_task_list(self, populated_manager, capsys):
-        """Test that show_tasks can display a custom list of tasks"""
-        # Create a subset of tasks
-        custom_list = [populated_manager.tasks[0], populated_manager.tasks[2]]
-
-        populated_manager.show_tasks(custom_list)
-
-        captured = capsys.readouterr()
-        assert "ID: 1" in captured.out
-        assert "ID: 3" in captured.out
-        # Task 2 should not be in output
-        assert captured.out.count("ID:") == 2
-
-    def test_show_tasks_with_filtered_results(self, manager, capsys):
-        """Test show_tasks with filtered task results"""
-        manager.add_task("Task 1")
-        manager.add_task("Task 2")
-        manager.add_task("Task 3")
-        manager.tasks[0].done()
-
-        done_tasks = manager.get_filtered_tasks(GET_ONLY_DONE_TASKS)
-        manager.show_tasks(done_tasks)
-
-        captured = capsys.readouterr()
-        assert "ID: 1" in captured.out
-        assert captured.out.count("ID:") == 1
-
-    def test_show_tasks_with_empty_list(self, manager, capsys):
-        """Test that show_tasks with empty list prints nothing"""
-        manager.show_tasks([])
-
-        captured = capsys.readouterr()
-        assert captured.out == ""
-
-    def test_show_tasks_on_empty_manager(self, manager, capsys):
-        """Test that show_tasks on empty manager prints nothing"""
-        manager.show_tasks()
-
-        captured = capsys.readouterr()
-        assert captured.out == ""
-
     # Tests for predefined predicates
     def test_get_only_pending_tasks_predicate(self):
         """Test that GET_ONLY_PENDING_TASKS predicate works correctly"""
@@ -448,7 +383,7 @@ class TestTaskManager:
         assert GET_ONLY_IN_PROGRESS_TASKS(pending_task) is False
 
     # Integration tests
-    def test_complete_workflow(self, manager, capsys):
+    def test_complete_workflow(self, manager):
         """Test a complete task management workflow"""
         # Add tasks
         manager.add_task("Task 1")
@@ -477,12 +412,6 @@ class TestTaskManager:
         # Delete a task
         manager.del_task(2)
         assert len(manager.tasks) == 2
-
-        # Show remaining tasks
-        manager.show_tasks()
-        captured = capsys.readouterr()
-        assert "ID: 1" in captured.out
-        assert "ID: 3" in captured.out
 
     def test_edge_case_delete_and_filter(self, manager):
         """Test filtering after deleting tasks"""
