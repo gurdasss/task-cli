@@ -7,6 +7,8 @@ from task_manager import (
     GET_ONLY_PENDING_TASKS,
     GET_ONLY_IN_PROGRESS_TASKS,
 )
+import json
+from task import Task
 
 
 def clear_screen():
@@ -15,6 +17,21 @@ def clear_screen():
 
 if __name__ == "__main__":
     task_manager = TaskManager()
+    json_file_path = "tasks.json"
+    # Load tasks from JSON file if it exists
+    if os.path.exists(json_file_path):
+        with open(json_file_path, "r") as f:
+
+            tasks_data = json.load(f)
+            for task_data in tasks_data:
+                task = Task(description=task_data["description"])
+                task.id = task_data["id"]
+                task.created_at = task_data["created_at"]
+                task.updated_at = task_data["updated_at"]
+                task.state = Task.State(task_data["state"])
+                task_manager.tasks.append(task)
+                task.task_id = max(task.task_id, task.id)  # Ensure task_id is updated to the max ID
+
     while True:
         current_input = input("task-cli> ")
         # Need to split the input into command and arguments
@@ -97,3 +114,7 @@ if __name__ == "__main__":
                     print(
                         f"ID: {task.id}, Description: {task.description}, Status: {task.state}, Created At: {task.created_at}, Updated At: {task.updated_at}"
                     )
+        
+        # Save tasks to JSON file before exiting
+        with open(json_file_path, "w") as f:
+            json.dump([task.to_dict() for task in task_manager.tasks], f)

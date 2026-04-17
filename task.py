@@ -51,3 +51,12 @@ class Task:
     def update_description(self, description):
         self.description = description
         self.updated_at = self.get_current_time()
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "description": self.description,
+            "state": self.state,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+        }
